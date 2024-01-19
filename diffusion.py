@@ -91,11 +91,11 @@ def sample2(model, x_T):
         #     break
 
         # 50t마다 이미지 출력
-        if time_step % 50 == 0:
-            x_0 = x_t.permute(0, 2, 3, 1).clamp(0, 1).detach().cpu().numpy() * 255
-            plt.imshow(x_0[0].astype(np.uint8))
-            plt.axis('off')  
-            plt.show()
+        # if time_step % 50 == 0:
+        #     x_0 = x_t.permute(0, 2, 3, 1).clamp(0, 1).detach().cpu().numpy() * 255
+        #     plt.imshow(x_0[0].astype(np.uint8))
+        #     plt.axis('off')  
+        #     plt.show()
     x_0 = x_t
     
     return x_0
