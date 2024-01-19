@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import cv2
 from matplotlib import pyplot as plt
-import tqdm
+from tqdm import tqdm
 
 import torch
 import torchvision.transforms as transforms
@@ -89,6 +89,13 @@ def sample2(model, x_T):
         # if np.isnan(x_t[0].detach().cpu().numpy()).any():
         #     print("Nan")
         #     break
+
+        # 50t마다 이미지 출력
+        if time_step % 50 == 0:
+            x_0 = x_t.permute(0, 2, 3, 1).clamp(0, 1).detach().cpu().numpy() * 255
+            plt.imshow(x_0[0].astype(np.uint8))
+            plt.axis('off')  
+            plt.show()
     x_0 = x_t
     
     return x_0
@@ -110,7 +117,7 @@ optim = torch.optim.Adam(model.parameters(), lr=2e-4)
 
 for e in range(1, 100+1):
     model.train()
-    for i, (x, _) in tqdm.tqdm(enumerate(dataloader, 1)):
+    for i, (x, _) in enumerate(tqdm(iter(dataloader)), 1):
         optim.zero_grad()
         x = x.to(device)
         loss = train(model, x)
@@ -118,6 +125,10 @@ for e in range(1, 100+1):
         optim.step()
         print("\r[Epoch: {} , Iter: {}/{}]  Loss: {:.3f}".format(e, i, len(dataloader), loss.item()), end='')
     print("\n> Eval at epoch {}".format(e))
+    
+    #save model
+    torch.save(model.state_dict(), './save/epoch_{}.pth'.format(e))
+
     model.eval()
     with torch.no_grad():
         x_T = torch.randn(5, 3, 32, 32).to(device)
