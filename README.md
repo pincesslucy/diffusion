@@ -6,4 +6,5 @@
 
 ---
 ## 예시 gif
-![Uploading output.gif…]()
+
+![output](https://github.com/pincesslucy/diffusion/assets/98650288/06ba8e5b-fdf9-46b6-9baa-1e93d7f48d42)
