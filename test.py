@@ -76,7 +76,7 @@ model.to(device)
 
 model.eval()
 with torch.no_grad():
-    x_T = torch.randn(5, 3, 32, 32).to(device)
+    x_T = torch.randn(5, 3, 128, 128).to(device)
     x_0 = sample2(model, x_T)
     x_0 = x_0.permute(0, 2, 3, 1).clamp(0, 1).detach().cpu().numpy() * 255
     for i in range(5):

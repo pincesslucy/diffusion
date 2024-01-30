@@ -9,8 +9,10 @@ from tqdm import tqdm
 import torch
 import torchvision.transforms as transforms
 from torchvision.datasets import CIFAR10
+from torch.utils.data import DataLoader
 
 from unet import UNet
+from dataset import Dataset
 
 T = 1000
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -100,15 +102,8 @@ def sample2(model, x_T):
     
     return x_0
 
-dataset = CIFAR10(
-    root="./data", train=True, download=True,
-    transform=transforms.Compose([
-        transforms.ToTensor()
-    ])
-)
-dataloader = torch.utils.data.DataLoader(
-    dataset, batch_size=32, shuffle=True, num_workers=4
-)
+dataset = Dataset('./data/archive/img_align_celeba/img_align_celeba')
+dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
 
 model = UNet(T=T, ch=128, ch_mult=[1, 2, 2, 1], attn=[1],
              num_res_blocks=2, dropout=0.1).to(device)
@@ -117,7 +112,7 @@ optim = torch.optim.Adam(model.parameters(), lr=2e-4)
 
 for e in range(1, 100+1):
     model.train()
-    for i, (x, _) in enumerate(tqdm(iter(dataloader)), 1):
+    for i, x in enumerate(tqdm(iter(dataloader)), 1):
         optim.zero_grad()
         x = x.to(device)
         loss = train(model, x)
@@ -131,7 +126,7 @@ for e in range(1, 100+1):
 
     model.eval()
     with torch.no_grad():
-        x_T = torch.randn(5, 3, 32, 32).to(device)
+        x_T = torch.randn(5, 3, 128, 128).to(device)
         x_0 = sample2(model, x_T)
         x_0 = x_0.permute(0, 2, 3, 1).clamp(0, 1).detach().cpu().numpy() * 255
         for i in range(5):
